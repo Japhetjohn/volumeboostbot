@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Add volume to your token with Nexium">
+  <title>Add Volume - Nexium</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <span class="logo-text">NEXIUM</span>
+      </a>
+      <div id="nav-menu" class="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="add-volume.html" class="nav-link active">Add Volume</a>
+      </div>
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle navigation menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="main-content add-volume-page">
+    <div class="page-container">
+      <h1 class="page-title">
+        <span class="gradient-text">Boost Your Volume</span>
+      </h1>
+      <p class="page-subtitle">
+        Connect your wallet and specify the amount to boost your token volume
+      </p>
+
+      <div class="wallet-section">
+        <h2 class="section-title">Connect Wallet</h2>
+        <button id="connect-wallet" class="btn btn-primary btn-large glow-button animate-pulse">
+          Connect Wallet
+        </button>
+
+        <div id="wallet-modal" class="modal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">Select Wallet</h3>
+              <button id="close-modal" class="modal-close" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="wallet-options">
+              <button id="connect-phantom" class="wallet-option glow-button animate-pulse" tabindex="0">
+                <div class="wallet-icon">
+                  <svg viewBox="0 0 128 128" fill="none">
+                    <path d="M106.3 106.3c-28.4 28.4-74.3 28.4-102.6 0-28.4-28.4-28.4-74.3 0-102.6C32.1-24.6 78-24.6 106.3 3.7c15.6 15.6 21.9 37.5 18.8 58.1" fill="url(#phantom-gradient)"/>
+                    <defs>
+                      <linearGradient id="phantom-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#AB9FF2"/>
+                        <stop offset="100%" style="stop-color:#4E44CE"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+                <span class="wallet-name">Connect Phantom</span>
+              </button>
+
+              <button id="connect-metamask" class="wallet-option glow-button animate-pulse" tabindex="0">
+                <div class="wallet-icon">
+                  <svg viewBox="0 0 318.6 318.6" fill="none">
+                    <polygon fill="#E2761B" stroke="#E2761B" points="274.1,35.5 174.6,109.4 193,65.8"/>
+                    <polygon fill="#E4761B" stroke="#E4761B" points="44.4,35.5 143.1,110.1 125.6,65.8"/>
+                    <polygon fill="#E4761B" stroke="#E4761B" points="238.3,206.8 211.8,247.4 267.4,261.7 281.5,207.7"/>
+                    <polygon fill="#E4761B" stroke="#E4761B" points="37.3,207.7 51.3,261.7 106.8,247.4 80.3,206.8"/>
+                    <polygon fill="#F6851B" stroke="#F6851B" points="103.6,138.2 87.8,162.1 143.1,164.6 141.1,105.6"/>
+                  </svg>
+                </div>
+                <span class="wallet-name">Connect MetaMask</span>
+              </button>
+
+              <button id="connect-trust" class="wallet-option glow-button animate-pulse" tabindex="0">
+                <div class="wallet-icon">
+                  <svg viewBox="0 0 1024 1024" fill="none">
+                    <circle cx="512" cy="512" r="512" fill="url(#trust-gradient)"/>
+                    <path d="M512 128L256 256v256c0 170.667 106.667 330.667 256 384 149.333-53.333 256-213.333 256-384V256L512 128z" fill="white"/>
+                    <defs>
+                      <linearGradient id="trust-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3375BB"/>
+                        <stop offset="100%" style="stop-color:#1B4F9C"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+                <span class="wallet-name">Connect Trust</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="boost-section" class="boost-section hidden">
+        <h2 class="section-title">Boost Volume</h2>
+
+        <div class="amount-section">
+          <label for="amount-input" class="input-label">Enter Amount (USD)</label>
+          <div class="amount-input-wrapper">
+            <span class="currency-symbol">$</span>
+            <input
+              type="number"
+              id="amount-input"
+              class="amount-input"
+              placeholder="0.00"
+              min="1"
+              step="0.01"
+              aria-label="Amount in USD"
+            />
+          </div>
+          <p class="input-hint">Minimum: $1.00</p>
+        </div>
+
+        <div class="network-info">
+          <div class="info-item">
+            <span class="info-label">Network:</span>
+            <span id="network-display" class="info-value">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Wallet:</span>
+            <span id="wallet-address-display" class="info-value">-</span>
+          </div>
+        </div>
+
+        <button id="boost-now-btn" class="btn btn-primary btn-large glow-button" disabled>
+          Boost Now
+          <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="feedback-container"></div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <p>&copy; 2025 Nexium. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#" class="footer-link">Privacy Policy</a>
+        <a href="#" class="footer-link">Terms of Service</a>
+        <a href="#" class="footer-link">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
