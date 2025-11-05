@@ -32,46 +32,11 @@ export class TransactionService {
   }
 
   /**
-   * Convert USD to ETH (simplified conversion - use price oracle in production)
-   * @param {number} usdAmount - Amount in USD
-   * @returns {string} Amount in ETH
-   */
-  convertUSDtoETH(usdAmount) {
-    // Placeholder conversion rate: 1 USD = 0.0005 ETH
-    // In production, use a price oracle like Chainlink
-    const ethAmount = (usdAmount * 0.0005).toFixed(6);
-    return ethAmount;
-  }
-
-  /**
-   * Convert USD to SOL (simplified conversion - use price oracle in production)
-   * @param {number} usdAmount - Amount in USD
-   * @returns {number} Amount in SOL
-   */
-  convertUSDtoSOL(usdAmount) {
-    // Placeholder conversion rate: 1 USD = 0.005 SOL
-    // In production, use a price oracle
-    return usdAmount * 0.005;
-  }
-
-  /**
-   * Convert USD to BNB (simplified conversion - use price oracle in production)
-   * @param {number} usdAmount - Amount in USD
-   * @returns {string} Amount in BNB
-   */
-  convertUSDtoBNB(usdAmount) {
-    // Placeholder conversion rate: 1 USD = 0.002 BNB
-    // In production, use a price oracle
-    const bnbAmount = (usdAmount * 0.002).toFixed(6);
-    return bnbAmount;
-  }
-
-  /**
    * Boost volume using MetaMask (Ethereum)
-   * @param {number} amountUSD - Amount in USD to boost
+   * @param {number} amount - Amount in ETH to boost
    * @returns {Promise<string>} Transaction hash
    */
-  async boostWithMetaMask(amountUSD) {
+  async boostWithMetaMask(amount) {
     if (!window.ethereum) {
       throw new Error('MetaMask not found');
     }
@@ -79,8 +44,8 @@ export class TransactionService {
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
 
-    const ethAmount = this.convertUSDtoETH(amountUSD);
-    const weiAmount = ethers.parseEther(ethAmount);
+    // Convert ETH amount to wei
+    const weiAmount = ethers.parseEther(amount.toString());
 
     const tx = await signer.sendTransaction({
       to: CONFIG.BOOST_ADDRESSES.ethereum,
@@ -96,11 +61,11 @@ export class TransactionService {
 
   /**
    * Boost volume using Phantom (Solana)
-   * @param {number} amountUSD - Amount in USD to boost
+   * @param {number} amount - Amount in SOL to boost
    * @param {string} publicKey - Sender's public key
    * @returns {Promise<string>} Transaction signature
    */
-  async boostWithPhantom(amountUSD, publicKey) {
+  async boostWithPhantom(amount, publicKey) {
     if (!window.solana) {
       throw new Error('Phantom wallet not found');
     }
@@ -109,8 +74,8 @@ export class TransactionService {
       this.initializeSolanaConnection();
     }
 
-    const solAmount = this.convertUSDtoSOL(amountUSD);
-    const lamports = Math.floor(solAmount * LAMPORTS_PER_SOL);
+    // Convert SOL amount to lamports
+    const lamports = Math.floor(amount * LAMPORTS_PER_SOL);
 
     const senderPublicKey = new PublicKey(publicKey);
     const recipientPublicKey = new PublicKey(CONFIG.BOOST_ADDRESSES.solana);
@@ -147,10 +112,10 @@ export class TransactionService {
 
   /**
    * Boost volume using Trust Wallet (BNB Smart Chain)
-   * @param {number} amountUSD - Amount in USD to boost
+   * @param {number} amount - Amount in BNB to boost
    * @returns {Promise<string>} Transaction hash
    */
-  async boostWithTrustWallet(amountUSD) {
+  async boostWithTrustWallet(amount) {
     if (!window.ethereum) {
       throw new Error('Trust Wallet not found');
     }
@@ -158,8 +123,8 @@ export class TransactionService {
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
 
-    const bnbAmount = this.convertUSDtoBNB(amountUSD);
-    const weiAmount = ethers.parseEther(bnbAmount);
+    // Convert BNB amount to wei
+    const weiAmount = ethers.parseEther(amount.toString());
 
     const tx = await signer.sendTransaction({
       to: CONFIG.BOOST_ADDRESSES.bnb,

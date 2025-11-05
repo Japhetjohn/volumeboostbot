@@ -99,21 +99,32 @@
       <div id="boost-section" class="boost-section hidden">
         <h2 class="section-title">Boost Volume</h2>
 
+        <div class="token-address-section">
+          <label for="token-address-input" class="input-label">Token Address</label>
+          <input
+            type="text"
+            id="token-address-input"
+            class="token-address-input"
+            placeholder="Paste token contract address here"
+            aria-label="Token contract address"
+          />
+          <p class="input-hint">Enter the token contract address you want to boost volume for</p>
+        </div>
+
         <div class="amount-section">
-          <label for="amount-input" class="input-label">Enter Amount (USD)</label>
+          <label for="amount-input" class="input-label">Enter Amount</label>
           <div class="amount-input-wrapper">
-            <span class="currency-symbol">$</span>
             <input
               type="number"
               id="amount-input"
               class="amount-input"
               placeholder="0.00"
-              min="1"
+              min="0.01"
               step="0.01"
-              aria-label="Amount in USD"
+              aria-label="Amount"
             />
           </div>
-          <p class="input-hint">Minimum: $1.00</p>
+          <p class="input-hint">Minimum: 0.01</p>
         </div>
 
         <div class="network-info">

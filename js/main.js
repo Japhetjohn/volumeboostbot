@@ -152,9 +152,14 @@ class NexiumApp {
     try {
       const result = await this.wallet.connect(walletName);
 
+      // Determine token symbol based on network
+      let tokenSymbol = 'ETH';
+      if (result.network === 'Solana') tokenSymbol = 'SOL';
+      if (result.network === 'BNB Smart Chain') tokenSymbol = 'BNB';
+
       // Update UI with connection success
       this.ui.updateButtonState('connected', walletName, result.publicKey);
-      this.ui.showConnectedUI(result.network, result.publicKey);
+      this.ui.showConnectedUI(result.network, result.publicKey, tokenSymbol);
       this.ui.showFeedback(`${walletName} connected successfully!`, 'success');
 
       // Validate boost amount with new connection state
@@ -177,8 +182,13 @@ class NexiumApp {
       const connection = await this.wallet.checkExistingConnection();
 
       if (connection) {
+        // Determine token symbol based on network
+        let tokenSymbol = 'ETH';
+        if (connection.network === 'Solana') tokenSymbol = 'SOL';
+        if (connection.network === 'BNB Smart Chain') tokenSymbol = 'BNB';
+
         this.ui.updateButtonState('connected', connection.walletType, connection.publicKey);
-        this.ui.showConnectedUI(connection.network, connection.publicKey);
+        this.ui.showConnectedUI(connection.network, connection.publicKey, tokenSymbol);
         this.validateBoostAmount();
       }
     } catch (error) {
@@ -203,10 +213,17 @@ class NexiumApp {
    */
   async handleBoostNow() {
     const amount = this.ui.getAmount();
+    const tokenAddress = this.ui.getTokenAddress();
+
+    // Validate token address
+    if (!tokenAddress) {
+      this.ui.showFeedback('Please enter a token address.', 'error');
+      return;
+    }
 
     // Validate amount
     if (amount < CONFIG.MIN_BOOST_AMOUNT) {
-      this.ui.showFeedback(`Minimum boost amount is $${CONFIG.MIN_BOOST_AMOUNT}`, 'error');
+      this.ui.showFeedback(`Minimum boost amount is ${CONFIG.MIN_BOOST_AMOUNT}`, 'error');
       return;
     }
 
@@ -221,6 +238,10 @@ class NexiumApp {
 
       const walletType = this.wallet.getWalletType();
       const publicKey = this.wallet.getPublicKey();
+
+      console.log('Boosting volume for token:', tokenAddress);
+      console.log('Amount:', amount);
+      console.log('Wallet type:', walletType);
 
       let txHash;
 
@@ -241,6 +262,7 @@ class NexiumApp {
 
       this.ui.showFeedback('Volume boost successful!', 'success');
       console.log('Transaction successful:', txHash);
+      console.log('Token address for volume boost:', tokenAddress);
 
       // Clear amount input
       this.ui.clearAmount();

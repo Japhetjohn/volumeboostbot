@@ -2,6 +2,7 @@
  * UI Manager - Handles all UI interactions and DOM manipulation
  */
 
+import { CONFIG } from './config.js';
 import { escapeHTML, shortenAddress } from './utils.js';
 
 export class UIManager {
@@ -117,8 +118,9 @@ export class UIManager {
    * Show the connected UI after successful wallet connection
    * @param {string} networkName - Name of the connected network
    * @param {string} address - Wallet address
+   * @param {string} tokenSymbol - Token symbol (SOL/ETH/BNB)
    */
-  showConnectedUI(networkName, address) {
+  showConnectedUI(networkName, address, tokenSymbol = '') {
     if (this.dom.boostSection) {
       this.dom.boostSection.classList.remove('hidden');
     }
@@ -137,7 +139,44 @@ export class UIManager {
       this.dom.connectWallet.classList.add('connected');
     }
 
+    // Update amount input label and placeholder with token symbol
+    this.updateTokenSymbol(tokenSymbol);
+
     this.closeModal();
+  }
+
+  /**
+   * Update UI to show the correct token symbol
+   * @param {string} tokenSymbol - Token symbol (SOL/ETH/BNB)
+   */
+  updateTokenSymbol(tokenSymbol) {
+    if (!tokenSymbol) return;
+
+    // Update input label
+    const inputLabel = document.querySelector('label[for="amount-input"]');
+    if (inputLabel) {
+      inputLabel.textContent = `Enter Amount (${tokenSymbol})`;
+    }
+
+    // Update input placeholder
+    if (this.dom.amountInput) {
+      this.dom.amountInput.placeholder = `0.00 ${tokenSymbol}`;
+    }
+
+    // Update input hint
+    const inputHint = document.querySelector('.input-hint');
+    if (inputHint) {
+      inputHint.textContent = `Minimum: ${CONFIG.MIN_BOOST_AMOUNT} ${tokenSymbol}`;
+    }
+  }
+
+  /**
+   * Get token address from input
+   * @returns {string} Token address
+   */
+  getTokenAddress() {
+    const tokenAddressInput = document.getElementById('token-address-input');
+    return tokenAddressInput?.value.trim() || '';
   }
 
   /**

@@ -23,6 +23,6 @@ export const CONFIG = {
     BNB_SMART_CHAIN: 56
   },
 
-  // Minimum boost amount in USD
-  MIN_BOOST_AMOUNT: 1
+  // Minimum boost amount (native token)
+  MIN_BOOST_AMOUNT: 0.01
 };
