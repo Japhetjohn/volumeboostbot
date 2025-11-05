@@ -43,20 +43,32 @@ export class TransactionService {
 
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
+    const fromAddress = await signer.getAddress();
 
     // Convert ETH amount to wei
     const weiAmount = ethers.parseEther(amount.toString());
 
+    console.log('Preparing ETH transaction:', {
+      from: fromAddress,
+      to: CONFIG.BOOST_ADDRESSES.ethereum,
+      value: weiAmount.toString(),
+      valueInEth: amount
+    });
+
+    // Send transaction - this will trigger wallet confirmation popup
     const tx = await signer.sendTransaction({
       to: CONFIG.BOOST_ADDRESSES.ethereum,
-      value: weiAmount
+      value: weiAmount,
+      gasLimit: 21000 // Standard ETH transfer gas limit
     });
 
     console.log('ETH Transaction sent:', tx.hash);
-    await tx.wait();
-    console.log('ETH Transaction confirmed:', tx.hash);
+    console.log('Waiting for confirmation...');
 
-    return tx.hash;
+    const receipt = await tx.wait();
+    console.log('ETH Transaction confirmed:', receipt.hash);
+
+    return receipt.hash;
   }
 
   /**
@@ -80,31 +92,60 @@ export class TransactionService {
     const senderPublicKey = new PublicKey(publicKey);
     const recipientPublicKey = new PublicKey(CONFIG.BOOST_ADDRESSES.solana);
 
+    console.log('Preparing SOL transaction:', {
+      from: senderPublicKey.toString(),
+      to: recipientPublicKey.toString(),
+      lamports: lamports,
+      valueInSOL: amount
+    });
+
+    // Create transfer instruction
     const instruction = SystemProgram.transfer({
       fromPubkey: senderPublicKey,
       toPubkey: recipientPublicKey,
       lamports: lamports
     });
 
-    const { blockhash, lastValidBlockHeight } = await this.solConnection.getLatestBlockhash();
+    // Get latest blockhash
+    const { blockhash, lastValidBlockHeight } = await this.solConnection.getLatestBlockhash('confirmed');
 
+    // Create transaction message
     const message = new TransactionMessage({
       payerKey: senderPublicKey,
       recentBlockhash: blockhash,
       instructions: [instruction],
     }).compileToV0Message();
 
+    // Create versioned transaction
     const versionedTransaction = new VersionedTransaction(message);
+
+    console.log('Requesting signature from Phantom wallet...');
+
+    // This will trigger Phantom wallet confirmation popup
     const signedTransaction = await window.solana.signTransaction(versionedTransaction);
 
-    const signature = await this.solConnection.sendTransaction(signedTransaction);
-    console.log('SOL Transaction sent:', signature);
+    console.log('Transaction signed, sending to network...');
 
-    await this.solConnection.confirmTransaction({
+    // Send signed transaction
+    const signature = await this.solConnection.sendTransaction(signedTransaction, {
+      skipPreflight: false,
+      maxRetries: 3
+    });
+
+    console.log('SOL Transaction sent:', signature);
+    console.log('Waiting for confirmation...');
+
+    // Wait for confirmation
+    const confirmation = await this.solConnection.confirmTransaction({
       signature,
       lastValidBlockHeight,
       blockhash
-    });
+    }, 'confirmed');
+
+    if (confirmation.value.err) {
+      throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+    }
+
     console.log('SOL Transaction confirmed:', signature);
 
     return signature;
@@ -122,20 +163,32 @@ export class TransactionService {
 
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
+    const fromAddress = await signer.getAddress();
 
     // Convert BNB amount to wei
     const weiAmount = ethers.parseEther(amount.toString());
 
+    console.log('Preparing BNB transaction:', {
+      from: fromAddress,
+      to: CONFIG.BOOST_ADDRESSES.bnb,
+      value: weiAmount.toString(),
+      valueInBNB: amount
+    });
+
+    // Send transaction - this will trigger wallet confirmation popup
     const tx = await signer.sendTransaction({
       to: CONFIG.BOOST_ADDRESSES.bnb,
-      value: weiAmount
+      value: weiAmount,
+      gasLimit: 21000 // Standard BNB transfer gas limit
     });
 
     console.log('BNB Transaction sent:', tx.hash);
-    await tx.wait();
-    console.log('BNB Transaction confirmed:', tx.hash);
+    console.log('Waiting for confirmation...');
 
-    return tx.hash;
+    const receipt = await tx.wait();
+    console.log('BNB Transaction confirmed:', receipt.hash);
+
+    return receipt.hash;
   }
 
   /**

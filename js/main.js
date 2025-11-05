@@ -273,8 +273,17 @@ class NexiumApp {
 
       let errorMessage = 'Failed to boost volume. Please try again.';
 
-      if (error.message?.includes('rejected') || error.message?.includes('denied')) {
-        errorMessage = 'Transaction rejected by user.';
+      // Handle specific error cases
+      if (error.message?.includes('rejected') || error.message?.includes('denied') || error.message?.includes('User rejected')) {
+        errorMessage = 'Transaction rejected. Please approve the transaction in your wallet.';
+      } else if (error.message?.includes('insufficient funds') || error.message?.includes('insufficient balance')) {
+        errorMessage = 'Insufficient balance. Please add funds to your wallet.';
+      } else if (error.message?.includes('user rejected') || error.code === 4001) {
+        errorMessage = 'Transaction cancelled by user.';
+      } else if (error.message?.includes('gas')) {
+        errorMessage = 'Transaction failed due to gas estimation. Please check your balance.';
+      } else if (error.message?.includes('network')) {
+        errorMessage = 'Network error. Please check your internet connection.';
       } else if (error.message) {
         errorMessage = error.message;
       }
