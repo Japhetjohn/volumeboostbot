@@ -350,6 +350,12 @@ export class WalletManager {
         const newAccount = accounts[0]?.toLowerCase();
         const currentAccount = this.publicKey?.toLowerCase();
 
+        // Don't trigger if this is the initial connection (publicKey was null)
+        if (!currentAccount) {
+          console.log('Initial connection, ignoring account change event');
+          return;
+        }
+
         // Only trigger callback if account actually changed
         if (newAccount !== currentAccount) {
           console.log('Account change detected, triggering callback');
@@ -369,6 +375,12 @@ export class WalletManager {
         console.log('Solana account changed:', publicKey?.toString());
         const newAccount = publicKey?.toString();
         const currentAccount = this.publicKey;
+
+        // Don't trigger if this is the initial connection (publicKey was null)
+        if (!currentAccount) {
+          console.log('Initial connection, ignoring account change event');
+          return;
+        }
 
         // Only trigger callback if account actually changed
         if (newAccount !== currentAccount) {

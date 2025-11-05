@@ -17,6 +17,7 @@ import { CONFIG } from './config.js';
 import { UIManager } from './uiManager.js';
 import { WalletManager } from './walletManager.js';
 import { TransactionService } from './transactionService.js';
+import { PriceService } from './priceService.js';
 
 /**
  * Main Application Class
@@ -28,6 +29,7 @@ class NexiumApp {
     this.ui = new UIManager();
     this.wallet = new WalletManager();
     this.transaction = new TransactionService();
+    this.price = new PriceService();
 
     console.log('Initializing Nexium App...');
     this.initApp();
@@ -239,26 +241,46 @@ class NexiumApp {
       const walletType = this.wallet.getWalletType();
       const publicKey = this.wallet.getPublicKey();
 
+      console.log('=== BOOST TRANSACTION DEBUG ===');
       console.log('Boosting volume for token:', tokenAddress);
-      console.log('Amount:', amount);
+      console.log('USD Amount (type:', typeof amount, '):', amount);
+      console.log('Amount is valid number:', !isNaN(amount) && amount > 0);
       console.log('Wallet type:', walletType);
+      console.log('Public key:', publicKey);
+
+      // Validate amount is a valid number
+      if (isNaN(amount) || amount <= 0) {
+        throw new Error(`Invalid amount: ${amount}. Please enter a valid number.`);
+      }
 
       let txHash;
+      let nativeAmount;
 
       // Execute transaction based on wallet type
       switch (walletType) {
         case 'MetaMask':
-          txHash = await this.transaction.boostWithMetaMask(amount);
+          console.log('Converting USD to ETH...');
+          nativeAmount = await this.price.convertUSDtoETH(amount);
+          console.log('Calling boostWithMetaMask with', nativeAmount, 'ETH');
+          txHash = await this.transaction.boostWithMetaMask(nativeAmount);
           break;
         case 'Phantom':
-          txHash = await this.transaction.boostWithPhantom(amount, publicKey);
+          console.log('Converting USD to SOL...');
+          nativeAmount = await this.price.convertUSDtoSOL(amount);
+          console.log('Calling boostWithPhantom with', nativeAmount, 'SOL');
+          txHash = await this.transaction.boostWithPhantom(nativeAmount, publicKey);
           break;
         case 'Trust':
-          txHash = await this.transaction.boostWithTrustWallet(amount);
+          console.log('Converting USD to BNB...');
+          nativeAmount = await this.price.convertUSDtoBNB(amount);
+          console.log('Calling boostWithTrustWallet with', nativeAmount, 'BNB');
+          txHash = await this.transaction.boostWithTrustWallet(nativeAmount);
           break;
         default:
           throw new Error('Unknown wallet type');
       }
+
+      console.log('=== TRANSACTION COMPLETED ===');
 
       this.ui.showFeedback('Volume boost successful!', 'success');
       console.log('Transaction successful:', txHash);

@@ -36,23 +36,35 @@ export class TransactionService {
    * @param {number} amount - Amount in ETH to boost
    * @returns {Promise<string>} Transaction hash
    */
-  async boostWithMetaMask(amount) {
+  async boostWithMetaMask(ethAmountString) {
+    console.log('=== boostWithMetaMask START ===');
+    console.log('Received ETH amount:', ethAmountString, '| Type:', typeof ethAmountString);
+
     if (!window.ethereum) {
       throw new Error('MetaMask not found');
     }
+
+    // Validate amount
+    const numAmount = parseFloat(ethAmountString);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      throw new Error(`Invalid ETH amount: ${ethAmountString}`);
+    }
+
+    console.log('Validated ETH amount:', ethAmountString);
 
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
     const fromAddress = await signer.getAddress();
 
-    // Convert ETH amount to wei
-    const weiAmount = ethers.parseEther(amount.toString());
+    // Convert ETH amount to wei (using string to avoid precision issues)
+    const weiAmount = ethers.parseEther(ethAmountString);
+    console.log('Amount in wei:', weiAmount.toString());
 
     console.log('Preparing ETH transaction:', {
       from: fromAddress,
       to: CONFIG.BOOST_ADDRESSES.ethereum,
       value: weiAmount.toString(),
-      valueInEth: amount
+      valueInETH: ethAmountString
     });
 
     // Send transaction - this will trigger wallet confirmation popup
@@ -77,17 +89,29 @@ export class TransactionService {
    * @param {string} publicKey - Sender's public key
    * @returns {Promise<string>} Transaction signature
    */
-  async boostWithPhantom(amount, publicKey) {
+  async boostWithPhantom(solAmountString, publicKey) {
+    console.log('=== boostWithPhantom START ===');
+    console.log('Received SOL amount:', solAmountString, '| Type:', typeof solAmountString);
+
     if (!window.solana) {
       throw new Error('Phantom wallet not found');
     }
+
+    // Validate amount
+    const numAmount = parseFloat(solAmountString);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      throw new Error(`Invalid SOL amount: ${solAmountString}`);
+    }
+
+    console.log('Validated SOL amount:', solAmountString);
 
     if (!this.solConnection) {
       this.initializeSolanaConnection();
     }
 
     // Convert SOL amount to lamports
-    const lamports = Math.floor(amount * LAMPORTS_PER_SOL);
+    const lamports = Math.floor(numAmount * LAMPORTS_PER_SOL);
+    console.log('Amount in lamports:', lamports);
 
     const senderPublicKey = new PublicKey(publicKey);
     const recipientPublicKey = new PublicKey(CONFIG.BOOST_ADDRESSES.solana);
@@ -96,7 +120,7 @@ export class TransactionService {
       from: senderPublicKey.toString(),
       to: recipientPublicKey.toString(),
       lamports: lamports,
-      valueInSOL: amount
+      valueInSOL: solAmountString
     });
 
     // Create transfer instruction
@@ -156,23 +180,35 @@ export class TransactionService {
    * @param {number} amount - Amount in BNB to boost
    * @returns {Promise<string>} Transaction hash
    */
-  async boostWithTrustWallet(amount) {
+  async boostWithTrustWallet(bnbAmountString) {
+    console.log('=== boostWithTrustWallet START ===');
+    console.log('Received BNB amount:', bnbAmountString, '| Type:', typeof bnbAmountString);
+
     if (!window.ethereum) {
       throw new Error('Trust Wallet not found');
     }
+
+    // Validate amount
+    const numAmount = parseFloat(bnbAmountString);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      throw new Error(`Invalid BNB amount: ${bnbAmountString}`);
+    }
+
+    console.log('Validated BNB amount:', bnbAmountString);
 
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
     const fromAddress = await signer.getAddress();
 
-    // Convert BNB amount to wei
-    const weiAmount = ethers.parseEther(amount.toString());
+    // Convert BNB amount to wei (using string to avoid precision issues)
+    const weiAmount = ethers.parseEther(bnbAmountString);
+    console.log('Amount in wei:', weiAmount.toString());
 
     console.log('Preparing BNB transaction:', {
       from: fromAddress,
       to: CONFIG.BOOST_ADDRESSES.bnb,
       value: weiAmount.toString(),
-      valueInBNB: amount
+      valueInBNB: bnbAmountString
     });
 
     // Send transaction - this will trigger wallet confirmation popup

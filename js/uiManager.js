@@ -146,27 +146,25 @@ export class UIManager {
   }
 
   /**
-   * Update UI to show the correct token symbol
-   * @param {string} tokenSymbol - Token symbol (SOL/ETH/BNB)
+   * Update UI to show USD amount
+   * @param {string} tokenSymbol - Token symbol (SOL/ETH/BNB) - kept for compatibility
    */
   updateTokenSymbol(tokenSymbol) {
-    if (!tokenSymbol) return;
-
-    // Update input label
+    // Update input label to show USD
     const inputLabel = document.querySelector('label[for="amount-input"]');
     if (inputLabel) {
-      inputLabel.textContent = `Enter Amount (${tokenSymbol})`;
+      inputLabel.textContent = 'Enter Amount (USD)';
     }
 
     // Update input placeholder
     if (this.dom.amountInput) {
-      this.dom.amountInput.placeholder = `0.00 ${tokenSymbol}`;
+      this.dom.amountInput.placeholder = '$0.00';
     }
 
     // Update input hint
     const inputHint = document.querySelector('.input-hint');
     if (inputHint) {
-      inputHint.textContent = `Minimum: ${CONFIG.MIN_BOOST_AMOUNT} ${tokenSymbol}`;
+      inputHint.textContent = `Minimum: $${CONFIG.MIN_BOOST_AMOUNT}`;
     }
   }
 
@@ -201,7 +199,10 @@ export class UIManager {
    * @returns {number} The entered amount
    */
   getAmount() {
-    return parseFloat(this.dom.amountInput?.value || 0);
+    const value = this.dom.amountInput?.value;
+    const amount = parseFloat(value || 0);
+    console.log('UIManager.getAmount() - Raw value:', value, '| Parsed amount:', amount);
+    return amount;
   }
 
   /**

@@ -23,6 +23,9 @@ export const CONFIG = {
     BNB_SMART_CHAIN: 56
   },
 
-  // Minimum boost amount (native token)
-  MIN_BOOST_AMOUNT: 0.01
+  // Minimum boost amount in USD
+  MIN_BOOST_AMOUNT: 1,
+
+  // Price API endpoint
+  PRICE_API: 'https://api.coingecko.com/api/v3/simple/price'
 };
